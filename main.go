@@ -32,7 +32,11 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			tokenEnv, err := cmd.Flags().GetString("vault-wrapping-token-env-var")
+			roleIDEnv, err := cmd.Flags().GetString("vault-role-id-env")
+			if err != nil {
+				log.Fatal(err)
+			}
+			secretIDEnv, err := cmd.Flags().GetString("vault-secret-id-env")
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -54,9 +58,14 @@ func main() {
 				defer fd.Close()
 				writer = fd
 			}
-			wrappingToken := os.Getenv(tokenEnv)
-			if wrappingToken == "" {
-				log.Println("INFO: no initial token found, exiting")
+			roleID := os.Getenv(roleIDEnv)
+			if roleID == "" {
+				log.Println("INFO: no approle role id provided, exiting")
+			}
+			log.Printf("INFO: using role-id %s", roleID)
+			secretID := os.Getenv(secretIDEnv)
+			if roleID == "" {
+				log.Println("INFO: no approle secret id provided, exiting")
 			}
 
 			config := vault.DefaultConfig()
@@ -67,12 +76,13 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			api.SetToken(wrappingToken)
-			resp, err := api.Logical().Write("sys/wrapping/unwrap", nil)
+			resp, err := api.Logical().Write("auth/approle/login", map[string]interface{}{
+				"role_id":   roleID,
+				"secret_id": secretID,
+			})
 			if err != nil {
 				log.Fatal(err)
 			}
-
 			err = tpl.Execute(writer, map[string]interface{}{
 				"Token":     resp.Auth.ClientToken,
 				"VaultAddr": api.Address(),
@@ -84,6 +94,7 @@ func main() {
 	}
 	rootCmd.Flags().StringP("out", "o", "-", "write output to this file")
 	rootCmd.Flags().StringP("vault-addr-env-var", "a", "", "vault server address environment variable")
-	rootCmd.Flags().StringP("vault-wrapping-token-env-var", "t", "VAULT_WRAPPING_TOKEN", "vault wrapping token environment variable")
+	rootCmd.Flags().StringP("vault-role-id-env", "r", "VAULT_APPROLE_ID", "vault approle role name environment variable")
+	rootCmd.Flags().StringP("vault-secret-id-env", "s", "VAULT_APPROLE_SECRET_ID", "vault approle secret id environment variable")
 	rootCmd.Execute()
 }
