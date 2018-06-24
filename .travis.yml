@@ -1,0 +1,15 @@
+sudo: required
+language: go
+services:
+- docker
+script:
+- make build
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: KQpG9DpsJw80tzoJ/Gv30L1n+bcdZYaWzPEkyBklCljFJVy7rQV1BlM1C9C39hOhQtCobDAYqX77YANgEHvcCfAlA/auM7KzMnSJzNwfTwhfN3rYOMSyEZcvdWytTbX3MOhp0MJNywebp/tXFKc1yrC0OHfXdUHMn2LZ3pmZ0yzNfCCLqfaXUow3A9SLdJTbccJXYiKBkNnlv3aOg7zyyOfV4WgNdV0m4zbUtDsf1jgb6sb4VYvxQn1TGGeOvxTak54BPSusPC5rbmGOVVIuJDdRb7YWkxJXPf7X1jqofOqBzMouCsQbnK9q3xJNqvZYGqVjhUgTr+C+4lvI7mxuAFupkXH4Z0GzUSIu5GgvFD5wgFv2P9YilRxqMBuDamML/YdNFg0IVPLCZ1zNIzmdT3BQupidezcj/my7o9ooTDW+t2wLCQsFZ9YV1YHzB7gGNJ/TKYwLpkAUshNCnR0fkhk8at59Nv1gun38iOwNILU7lWu2bc2/RsZiR6kzPVSihzOsdeNO3RAvZVlLmZqiaURuVwj2i4Vgb+ZGdD6I8g+uoR2vpCGUuLyRprgD1Obl4txnA1A0bxRr2rHyOrJ9KBv4+fZq2t3YBixh2hEeredaQ192sWRe8NGMFc1cXfKYI4ALQ93Y3pIGM8/GRl7Gukd+Jn0Dw7yicNmEErUiQ7s=
+  file: "./vault-config-extractor"
+  on:
+    repo: vx-labs/vault-config-extractor
+    tags: true
