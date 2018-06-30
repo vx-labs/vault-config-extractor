@@ -47,10 +47,6 @@ func main() {
 			case "-":
 				writer = cmd.OutOrStdout()
 			default:
-				if _, err := os.Stat(out); !os.IsNotExist(err) {
-					log.Println("INFO: outfile exists, exiting")
-					return
-				}
 				fd, err := os.Create(out)
 				if err != nil {
 					log.Fatal(err)
@@ -61,11 +57,13 @@ func main() {
 			roleID := os.Getenv(roleIDEnv)
 			if roleID == "" {
 				log.Println("INFO: no approle role id provided, exiting")
+				return
 			}
 			log.Printf("INFO: using role-id %s", roleID)
 			secretID := os.Getenv(secretIDEnv)
 			if roleID == "" {
 				log.Println("INFO: no approle secret id provided, exiting")
+				return
 			}
 
 			config := vault.DefaultConfig()
@@ -83,6 +81,7 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
+			log.Printf("Got token from vault: policies=%v, ttl=%d", resp.Auth.Policies, resp.Auth.LeaseDuration)
 			err = tpl.Execute(writer, map[string]interface{}{
 				"Token":     resp.Auth.ClientToken,
 				"VaultAddr": api.Address(),
