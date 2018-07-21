@@ -1,10 +1,10 @@
-FROM vxlabs/glide as builder
+FROM vxlabs/dep as builder
 
 WORKDIR $GOPATH/src/github.com/vx-labs/vault-config-extractor
-COPY glide* ./
-RUN glide install -v
+COPY Gopkg* ./
+RUN dep ensure -vendor-only
 COPY . ./
-RUN go test $(glide nv) && \
+RUN go test ./... && \
     go build -buildmode=exe -a -o /bin/vault-config-extractor ./main.go
 
 FROM alpine

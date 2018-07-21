@@ -1,6 +1,0 @@
-package: github.com/vx-labs/vault-config-extractor
-import:
-- package: github.com/hashicorp/vault
-  subpackages:
-  - api
-- package: github.com/spf13/cobra
